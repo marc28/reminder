@@ -35,5 +35,5 @@ public class RemindersActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void marcTest(){}
+
 }
