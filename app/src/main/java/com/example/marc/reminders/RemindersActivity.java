@@ -4,13 +4,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class RemindersActivity extends AppCompatActivity {
 
+    private ListView mListView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reminders);
+        super.onCreate(savedInstanceState); //leave as default
+        setContentView(R.layout.activity_reminders); //this is the entire screen view
+        mListView = (ListView) findViewById(R.id.reminders_list_view);
+        //ArrayAdapter is the controller in model-view-controller
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                this, //this refers to this activity
+                R.layout.reminders_row, //each entire row
+                R.id.row_text, //row (view) Reminder Text
+                new String[]{"first","second","third"} //records
+        );
+        mListView.setAdapter(arrayAdapter);
     }
 
     @Override
