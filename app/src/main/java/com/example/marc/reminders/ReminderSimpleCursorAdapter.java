@@ -23,12 +23,28 @@ public class ReminderSimpleCursorAdapter extends SimpleCursorAdapter {
         return super.newView(context, c, parent);
     }
 
+    //This method will be called by ListView during runtime
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         super.bindView(view, context, cursor);
+        ViewHolder holder = (ViewHolder)view.getTag();
+        if(holder == null){
+            holder = new ViewHolder();
+            holder.colImp = cursor.getColumnIndexOrThrow(RemindersDbAdapter.COL_IMPORTANT);
+            holder.listTab = view.findViewById(R.id.row_tab);
+            view.setTag(holder);
+        }
+        if(cursor.getInt(holder.colImp) > 0){
+            holder.listTab.setBackgroundColor(context.getResources().getColor(R.color.orange));
+        }else{
+            holder.listTab.setBackgroundColor(context.getResources().getColor(R.color.green));
+        }
     }
 
-
+    static class ViewHolder{
+        int colImp; //store column index
+        View listTab; //store view
+    }
 
 
 }
