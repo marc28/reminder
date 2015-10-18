@@ -1,5 +1,7 @@
 package com.example.marc.reminders;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RemindersActivity extends ActionBarActivity {
@@ -50,11 +53,36 @@ public class RemindersActivity extends ActionBarActivity {
         //wth data from the db (model)
         mListView.setAdapter(mCursorAdapter);
 
-        //Creating on click listener
+        //Creating on click listener to the ListView
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                Toast.makeText(RemindersActivity.this, "Position clicked: " + position, Toast.LENGTH_SHORT).show();
+            public void onItemClick(AdapterView<?> parent, View view, final int masterListPosition, long id){
+                //Alert Dialog box
+                AlertDialog.Builder builder = new AlertDialog.Builder(RemindersActivity.this); //context in constructor
+                // A ListView is needed
+                ListView modeListView = new ListView(RemindersActivity.this);
+                String [] modes = {"Edit Reminder", "Delete Reminder"};
+                //List view and builder needed an adapter
+                ArrayAdapter<String> modeAdapter = new ArrayAdapter<String>(RemindersActivity.this,
+                        android.R.layout.simple_list_item_1,android.R.id.text1, modes);
+                //Glue them together
+                modeListView.setAdapter(modeAdapter);
+                builder.setView(modeListView);
+
+                final Dialog dialog = builder.create();
+                dialog.show();
+                //Put a click listener on the inner ListView
+                modeListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        if (position ==0){
+                           Toast.makeText(RemindersActivity.this,"Edit " + masterListPosition,Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(RemindersActivity.this,"Delete " +  masterListPosition,Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss(); //gets rid of dialog box
+                    }
+                });
             }
         });
 
