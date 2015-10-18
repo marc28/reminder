@@ -13,25 +13,30 @@ import java.sql.SQLException;
 
 /**
  * Created by marc on 03/10/2015.
+ * <p/>
+ * Used for communicating with the database
  */
 public class RemindersDbAdapter {
 
     //    Column Names
-    public static final String COL_ID = "id";
+    public static final String COL_ID = "_id";
     public static final String COL_CONTENT = "content";
     public static final String COL_IMPORTANT = "important";
     //    Corresponding indices
     public static final int INDEX_ID = 0;
     public static final int INDEX_CONTENT = INDEX_ID + 1;
     public static final int INDEX_IMPORTANT = INDEX_ID + 2;
-    //Used for logging
-    private static final String TAG = "RemindersDbAdapter";
+
+
+    //Database stuff
     private DatabaseHelper mDbHelper; //DatabaseHelper is a SQLite API class used to open and close the database
     private SQLiteDatabase mDb; //used for executing SQL Statements
     private static final String DATABASE_NAME = "dba_reminders";
     private static final String TABLE_NAME = "dba_remdrs";
     private static final int DATABASE_VERSION = 1;
     private final Context mctx; //an abstract Android class that provides access to the Android operating system
+    //Used for logging
+    private static final String TAG = "RemindersDbAdapter";
 
     //Constructor
     public RemindersDbAdapter(Context ctx) {
@@ -41,7 +46,7 @@ public class RemindersDbAdapter {
     /**
      * This gets an instance of the database
      */
-    public void open() throws SQLException {
+    public void open() {
         mDbHelper = new DatabaseHelper(mctx);
         mDb = mDbHelper.getWritableDatabase();
     }
@@ -51,7 +56,7 @@ public class RemindersDbAdapter {
      */
     public void close() {
         if (mDbHelper != null) {
-
+            mDbHelper.close();
         }
     }
 
@@ -59,10 +64,10 @@ public class RemindersDbAdapter {
      * CRUD OPERATIONS
      */
     // TODO CREATE
-    public void createReminder(String content, int importance) {
-        ContentValues values = new ContentValues();
+    public void createReminder(String content, boolean importance) {
+        ContentValues values = new ContentValues(); //just a hashmap
         values.put(COL_CONTENT, content);
-        values.put(COL_IMPORTANT, importance);
+        values.put(COL_IMPORTANT, importance ? 1:0);
         mDb.insert(TABLE_NAME, null, values);
     }
 
@@ -76,11 +81,11 @@ public class RemindersDbAdapter {
 
     //TODO READ
     public Reminder fetchReminderById(int id) {
-        String [] columnNames = {COL_ID, COL_CONTENT, COL_IMPORTANT};
-        String whereClause = COL_ID + "=?";
-        String [] whereArgs = {String.valueOf(COL_ID)};
+        String[] columnNames = {COL_ID, COL_CONTENT, COL_IMPORTANT};
+        String whereClause = COL_ID + " =? ";
+        String[] whereArgs = {String.valueOf(COL_ID)};
         Cursor cursor = mDb.query(TABLE_NAME, columnNames, whereClause, whereArgs, null, null, null);
-        if(cursor != null){
+        if (cursor != null) {
             cursor.moveToFirst();
         }
         //return Reminder Object
@@ -92,10 +97,10 @@ public class RemindersDbAdapter {
     }
 
     //Move cursor to the first position
-    public Cursor fetchAllReminders(){
-        Cursor mCursor = mDb.query(TABLE_NAME,new String []{COL_ID,COL_CONTENT,COL_IMPORTANT},
-                null,null,null,null,null);
-        if(mCursor != null){
+    public Cursor fetchAllReminders() {
+        Cursor mCursor = mDb.query(TABLE_NAME, new String[]{COL_ID, COL_CONTENT, COL_IMPORTANT},
+                null, null, null, null, null);
+        if (mCursor != null) {
             mCursor.moveToFirst();
         }
         return mCursor;
@@ -103,45 +108,21 @@ public class RemindersDbAdapter {
 
 
     //TODO UPDATE
-    public void updateReminder(Reminder reminder){
+    public void updateReminder(Reminder reminder) {
         ContentValues values = new ContentValues();
-        values.put(COL_CONTENT,reminder.getContent());
+        values.put(COL_CONTENT, reminder.getContent());
         values.put(COL_IMPORTANT, reminder.getImportant());
-        mDb.update(TABLE_NAME, values,COL_ID + "=?", new String[]{String.valueOf(reminder.getId())});
+        mDb.update(TABLE_NAME, values, COL_ID + " =? ", new String[]{String.valueOf(reminder.getId())});
     }
 
     //TODO DELETE
-    public void deleteReminder(int id){
-        mDb.delete(TABLE_NAME,COL_ID + "=?",new String[]{String.valueOf(id)});
+    public void deleteReminder(int id) {
+        mDb.delete(TABLE_NAME, COL_ID + " =? ", new String[]{String.valueOf(id)});
     }
 
-    public void deleteAllReminders(){
-        mDb.delete(TABLE_NAME,null,null);
+    public void deleteAllReminders() {
+        mDb.delete(TABLE_NAME, null, null);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // SQLiteOpenHelper helps maintain the database with special callback methods
@@ -161,7 +142,7 @@ public class RemindersDbAdapter {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to " +
                     newVersion + ", which will destroy  all old data");
-            db.execSQL("DROP TABLE IF EXISTS" + TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             onCreate(db);
         }
     }

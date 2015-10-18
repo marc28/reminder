@@ -5,12 +5,12 @@ package com.example.marc.reminders;
 public class Reminder {
     private int mId;
     private String mContent;
-    private int important;
+    private int mImportant;
 
     public Reminder(int id, String content, int important) {
         mId = id;
         mContent = content;
-        this.important = important;
+        this.mImportant = important;
     }
 
     public int getId() {
@@ -30,10 +30,10 @@ public class Reminder {
     }
 
     public int getImportant() {
-        return important;
+        return mImportant;
     }
 
     public void setImportant(int important) {
-        this.important = important;
+        this.mImportant = important;
     }
 }
